@@ -49,13 +49,13 @@ function customerInquirer() {
 
 function displayProducts() {
 
-    console.log("\n===============================================");
-    console.log("\n==========Today's Available Products===========");
-    console.log("\n===============================================");
+    console.log("\n==============================================================================");
+    console.log("\n=========================Today's Available Products===========================");
+    console.log("\n==============================================================================");
 
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
-        //load products w/console.table 
+        //load products w/console.table
         console.table(res);
     });
     setTimeout(() => {
@@ -88,7 +88,7 @@ function customerPurchase() {
     inquirer
         .prompt({
             type: "input",
-            name: "id",
+            name: "itemID",
             message: "What is the ID of the product you wish to purchase?",
             validate: function (value) {
                 if (value) {
@@ -97,50 +97,29 @@ function customerPurchase() {
                 return false;
             }
         })
-        .then(function (answer) {
-            var purchaseID = answer.id;
-            // var quantity = checkAvailability(purchaseID, checkStock);
-            //---check if product availability is true or false
-            if (purchaseID) {
-                promptQuantity(purchaseID);
-            } else {
-                //-----inform customer if product is unavailable-----//
-                console.log("\nWe're Sorry. Product is Not in Stock At This Time. Please Try Again.");
-                customerInquirer();
-            }
-        })
+        .then((function (answer) {
+            connection.query("SELECT ITEM_ID, PRODUCT_NAME, DEPARTMENT_NAME, PRICE, STOCK_QUANTITY FROM products WHERE ?", {
+                ITEM_ID: answer.itemID
+            }, function (err, res) {
+                if (err) throw err;
+                if (res) {
+                    var displayItem = res[0].PRODUCT_NAME;
+                    continuePurchase(displayItem);
+                }
+            });
+        }))
 }
 
-function promptQuantity(purchaseID) {
-    //----inquirer customer for amount requested----------------//
+function continuePurchase(displayItem) {
     inquirer
         .prompt({
-            type: "input",
-            name: "amount",
-            message: "How many would you like to purchase?",
-            validate: function (value) {
-                if (value) {
-                    return true;
-                }
-                return false;
-            }
+            type: "list",
+            name: "confirm",
+            message: "Continue purchasing " + displayItem + "?",
+            choices: [
+                "YES",
+                "NO"
+            ]
         })
-        .then(function (answer) {
-            var amountRequested = answer.amount;
-            //----------check if there is enough product instock----------------//
-            if (amountRequested > purchaseID.stock_quantity) {
-                console.log("\nWe're Sorry. There is Not Enough in Stock. Please Try Again.");
-                displayProducts();
-            } else {
-                finalizePurchase(purchaseID, amountRequested);
-            }
-        })
-}
 
-function finalizePurchase(id, amountRequested) {
-    console.log("CHECK CHECK" + id + amountRequested);
-    connection.query("SELECT * FROM Products WHERE item_id = " + id, function (err, data) {
-        if (err) throw err;
-        console.log(data);
-    })
 }
