@@ -83,14 +83,15 @@ function displayProducts() {
 }
 
 function customerPurchase() {
-    //----inquirer customer of id and quantity-------//
+    //----inquirer customer of id and check inventory-------//
+    //-----if available run quantity function-------//
     inquirer
         .prompt({
             type: "input",
             name: "id",
             message: "What is the ID of the product you wish to purchase?",
             validate: function (value) {
-                if (isNaN(value) === false) {
+                if (value) {
                     return true;
                 }
                 return false;
@@ -98,6 +99,48 @@ function customerPurchase() {
         })
         .then(function (answer) {
             var purchaseID = answer.id;
-
+            // var quantity = checkAvailability(purchaseID, checkStock);
+            //---check if product availability is true or false
+            if (purchaseID) {
+                promptQuantity(purchaseID);
+            } else {
+                //-----inform customer if product is unavailable-----//
+                console.log("\nWe're Sorry. Product is Not in Stock At This Time. Please Try Again.");
+                customerInquirer();
+            }
         })
+}
+
+function promptQuantity(purchaseID) {
+    //----inquirer customer for amount requested----------------//
+    inquirer
+        .prompt({
+            type: "input",
+            name: "amount",
+            message: "How many would you like to purchase?",
+            validate: function (value) {
+                if (value) {
+                    return true;
+                }
+                return false;
+            }
+        })
+        .then(function (answer) {
+            var amountRequested = answer.amount;
+            //----------check if there is enough product instock----------------//
+            if (amountRequested > purchaseID.stock_quantity) {
+                console.log("\nWe're Sorry. There is Not Enough in Stock. Please Try Again.");
+                displayProducts();
+            } else {
+                finalizePurchase(purchaseID, amountRequested);
+            }
+        })
+}
+
+function finalizePurchase(id, amountRequested) {
+    console.log("CHECK CHECK" + id + amountRequested);
+    connection.query("SELECT * FROM Products WHERE item_id = " + id, function (err, data) {
+        if (err) throw err;
+        console.log(data);
+    })
 }
