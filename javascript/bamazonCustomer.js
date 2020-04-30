@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var chalk = require('chalk');
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -12,9 +13,9 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     //-----Display a Welcome Message-----------//
-    console.log("\n==============================================================================");
-    console.log("\n=============================WELCOME TO BAMAZON===============================");
-    console.log("\n==============================================================================");
+    console.log(chalk.bgMagenta("\n=============================================================================="));
+    console.log(chalk.bgMagenta("\n=============================WELCOME TO BAMAZON==============================="));
+    console.log(chalk.bgMagenta("\n=============================================================================="));
 
     console.log("\nConnected as ID: " + connection.threadId + "\n");
 
@@ -38,9 +39,9 @@ function customerInquirer() {
             if (answer.purchase === "YES") {
                 displayProducts();
             } else if (answer.purchase === "NO") {
-                console.log("\n==============================================================================");
-                console.log("\n===================Thank You For Shopping With Bamazon!=======================");
-                console.log("\n==============================================================================");
+                console.log(chalk.bgMagenta("\n=============================================================================="));
+                console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
+                console.log(chalk.bgMagenta("\n=============================================================================="));
 
                 connection.end();
             }
@@ -49,9 +50,9 @@ function customerInquirer() {
 
 function displayProducts() {
 
-    console.log("\n==============================================================================");
-    console.log("\n=========================Today's Available Products===========================");
-    console.log("\n==============================================================================");
+    console.log(chalk.bgBlue("\n=============================================================================="));
+    console.log(chalk.bgBlue("\n=========================Today's Available Products==========================="));
+    console.log(chalk.bgBlue("\n=============================================================================="));
 
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -75,7 +76,10 @@ function displayProducts() {
                 if (answer.continue === "YES") {
                     customerPurchase();
                 } else if (answer.continue === "NO") {
-                    console.log("\nThank You For Shopping With Bamazon!");
+                    console.log(chalk.bgMagenta("\n=============================================================================="));
+                    console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
+                    console.log(chalk.bgMagenta("\n=============================================================================="));
+
                     connection.end();
                 }
             })
@@ -103,7 +107,7 @@ function customerPurchase() {
             }, function (err, res) {
                 if (err) throw err;
                 if (res) {
-                    var displayItem = ("Item Id: " + res[0].ITEM_ID + " | " + "Product: " + res[0].PRODUCT_NAME + " | " + " Price: " + res[0].PRICE);
+                    var displayItem = (chalk.cyan("Item Id: " + res[0].ITEM_ID + " | " + "Product: " + res[0].PRODUCT_NAME + " | " + " Price: " + res[0].PRICE));
                     continuePurchase(displayItem);
                 }
             });
@@ -126,11 +130,14 @@ function continuePurchase(displayItem) {
                 queryQuantity(displayItem);
             } else if (answer.confirm === "NO") {
 
-                console.log("\n==============================================================================");
-                console.log("\n===================Thank You For Shopping With Bamazon!=======================");
-                console.log("\n==============================================================================");
+                console.log(chalk.bgMagenta("\n=============================================================================="));
+                console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
+                console.log(chalk.bgMagenta("\n=============================================================================="));
 
-                displayProducts();
+                console.log(chalk.yellow("\n==========================REDIRECTING============================="));
+                setTimeout(() => {
+                    displayProducts();
+                }, 1000);
             }
         })
 
@@ -154,15 +161,19 @@ function queryQuantity(displayItem) {
             connection.query("SELECT STOCK_QUANTITY FROM products WHERE ?", {
                 ITEM_ID: productArray[2]
             }, function (err, res) {
-                console.log(productArray);
-                console.log("IS IT WORKING?");
+                // console.log(productArray);
+                // console.log("IS IT WORKING?");
+                var productAmount = answer.quantity;
                 if (err) throw err;
                 if (res) {
-                    if (answer.quantity < res[0].STOCK_QUANTITY) {
+                    if (productAmount < res[0].STOCK_QUANTITY) {
                         finalizePurchase();
-                    } else if (answer.quantity > res[0].STOCK_QUANTITY) {
-                        console.log("\nWe're sorry, there is not enough in stock. Please try proceeding with a lower quantity")
-                        continuePurchase(displayItem);
+                    } else if (productAmount > res[0].STOCK_QUANTITY) {
+                        console.log(chalk.yellow("\nWe're sorry, there is not enough in stock. Please try again with a lower quantity.\n"));
+                        console.log(chalk.yellow("\n======================REDIRECTING============================\n"));
+                        setTimeout(() => {
+                            continuePurchase(displayItem);
+                        }, 1000);
                     }
                 }
             });
@@ -185,11 +196,13 @@ function finalizePurchase(displayItem) {
                 console.log("OK");
             } else if (answer.continue === "NO") {
 
-                console.log("\n==============================================================================");
-                console.log("\n===================Thank You For Shopping With Bamazon!=======================");
-                console.log("\n==============================================================================");
-
-                displayProducts();
+                console.log(chalk.bgMagenta("\n=============================================================================="));
+                console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
+                console.log(chalk.bgMagenta("\n=============================================================================="));
+                console.log(chalk.red("\n==========================REDIRECTING=================================\n"));
+                setTimeout(() => {
+                    displayProducts();
+                }, 1000);
             }
         })
 }
