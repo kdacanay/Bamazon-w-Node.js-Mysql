@@ -172,7 +172,7 @@ function queryQuantity(displayItem, productArray) {
                 // console.log(displayItem);
                 if (err) throw err;
                 if (res) {
-                    if (productAmount < res[0].STOCK_QUANTITY) {
+                    if (productAmount <= res[0].STOCK_QUANTITY) {
                         finalizePurchase();
                     } else if (productAmount > res[0].STOCK_QUANTITY) {
                         console.log(chalk.yellow("\nWe're sorry, there is not enough in stock. Please try again with a lower quantity.\n"));
