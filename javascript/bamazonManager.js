@@ -69,7 +69,7 @@ function productView() {
             .prompt({
                 type: "list",
                 name: "continue",
-                message: "Return to Previous Menu?",
+                message: "Return to Menu?",
                 choices: [
                     "YES",
                     "NO"
@@ -83,4 +83,31 @@ function productView() {
                 }
             })
     }, 1000);
+}
+
+function lowInventory() {
+    //connection query to select all products below <= 5
+    connection.query("SELECT * FROM products WHERE STOCK_QUANTITY <= 5", function (err, res) {
+        if (err) throw err;
+        //display w/console.table
+        console.table(res);
+
+        inquirer
+            .prompt({
+                type: "list",
+                name: "continue",
+                message: "Return to Menu?",
+                choices: [
+                    "YES",
+                    "NO"
+                ]
+            })
+            .then(function (answer) {
+                if (answer.continue === "YES") {
+                    managerMenu();
+                } else if (answer.continue === "NO") {
+                    connection.end();
+                }
+            })
+    })
 }
