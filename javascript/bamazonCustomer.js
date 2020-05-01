@@ -108,6 +108,8 @@ function customerPurchase() {
                 if (err) throw err;
                 if (res) {
                     displayItem = (chalk.cyan("Item Id: " + res[0].ITEM_ID + " | " + "Product: " + res[0].PRODUCT_NAME + " | " + " Price: " + res[0].PRICE));
+                    productPrice = res[0].PRICE;
+                    console.log(productPrice);
                     continuePurchase(displayItem);
                 }
             });
@@ -205,10 +207,15 @@ function finalizePurchase() {
                 connection.query("UPDATE products SET STOCK_QUANTITY = stock_quantity - ? WHERE ITEM_ID = ?",
                     [productAmount, finalProductId],
                     function (err, res) {
+                        finalTotal = (productAmount * productPrice);
                         if (err) throw err;
                         if (res) {
                             // console.log(res);
                             console.log(chalk.yellow("\nYou have successfully purchased " + productAmount + " " + displayItem + " !\n"));
+                            console.log(chalk.yellow("\nYour Final Total: " + finalTotal + "."))
+                            console.log(chalk.bgMagenta("\n=============================================================================="));
+                            console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
+                            console.log(chalk.bgMagenta("\n=============================================================================="));
                             console.log(chalk.yellow("\n==========================REDIRECTING============================="));
                             setTimeout(() => {
                                 displayProducts();
