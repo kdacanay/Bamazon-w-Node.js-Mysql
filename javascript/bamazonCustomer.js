@@ -107,7 +107,7 @@ function customerPurchase() {
             }, function (err, res) {
                 if (err) throw err;
                 if (res) {
-                    var displayItem = (chalk.cyan("Item Id: " + res[0].ITEM_ID + " | " + "Product: " + res[0].PRODUCT_NAME + " | " + " Price: " + res[0].PRICE));
+                    displayItem = (chalk.cyan("Item Id: " + res[0].ITEM_ID + " | " + "Product: " + res[0].PRODUCT_NAME + " | " + " Price: " + res[0].PRICE));
                     continuePurchase(displayItem);
                 }
             });
@@ -143,7 +143,7 @@ function continuePurchase(displayItem) {
 
 }
 
-function queryQuantity(displayItem) {
+function queryQuantity(displayItem, productArray) {
     var productArray = displayItem.split(" ", 3);
     inquirer
         .prompt({
@@ -161,9 +161,13 @@ function queryQuantity(displayItem) {
             connection.query("SELECT STOCK_QUANTITY FROM products WHERE ?", {
                 ITEM_ID: productArray[2]
             }, function (err, res) {
+                finalProductId = parseInt(productArray[2]);
                 // console.log(productArray);
                 // console.log("IS IT WORKING?");
-                var productAmount = answer.quantity;
+                productAmount = parseInt(answer.quantity);
+                // console.log(productAmount);
+                // console.log(finalProductId);
+                // console.log(displayItem);
                 if (err) throw err;
                 if (res) {
                     if (productAmount < res[0].STOCK_QUANTITY) {
@@ -172,7 +176,7 @@ function queryQuantity(displayItem) {
                         console.log(chalk.yellow("\nWe're sorry, there is not enough in stock. Please try again with a lower quantity.\n"));
                         console.log(chalk.yellow("\n======================REDIRECTING============================\n"));
                         setTimeout(() => {
-                            continuePurchase(displayItem);
+                            displayProducts();
                         }, 1000);
                     }
                 }
@@ -180,7 +184,9 @@ function queryQuantity(displayItem) {
         }))
 }
 
-function finalizePurchase(displayItem) {
+
+function finalizePurchase() {
+
     inquirer
         .prompt({
             type: "list",
@@ -193,13 +199,28 @@ function finalizePurchase(displayItem) {
         })
         .then(function (answer) {
             if (answer.continue === "YES") {
-                console.log("OK");
+                // console.log(productAmount);
+                // console.log(finalProductId);
+                console.log(chalk.yellow("\n=====================Finalizing Your Purchase=========================\n"));
+                connection.query("UPDATE products SET STOCK_QUANTITY = stock_quantity - ? WHERE ITEM_ID = ?",
+                    [productAmount, finalProductId],
+                    function (err, res) {
+                        if (err) throw err;
+                        if (res) {
+                            // console.log(res);
+                            console.log(chalk.yellow("\nYou have successfully purchased " + productAmount + " " + displayItem + " !\n"));
+                            console.log(chalk.yellow("\n==========================REDIRECTING============================="));
+                            setTimeout(() => {
+                                displayProducts();
+                            }, 1000);
+                        }
+                    })
             } else if (answer.continue === "NO") {
 
                 console.log(chalk.bgMagenta("\n=============================================================================="));
                 console.log(chalk.bgMagenta("\n===================Thank You For Shopping With Bamazon!======================="));
                 console.log(chalk.bgMagenta("\n=============================================================================="));
-                console.log(chalk.red("\n==========================REDIRECTING=================================\n"));
+                console.log(chalk.yellow("\n==========================REDIRECTING=================================\n"));
                 setTimeout(() => {
                     displayProducts();
                 }, 1000);
