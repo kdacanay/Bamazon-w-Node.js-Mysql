@@ -1,7 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var chalk = require('chalk');
-var table = require("table");
+var Table = require("cli-table");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -22,6 +22,59 @@ connection.connect(function (err) {
 
     supervisorMenu();
 });
+
+function deptTable() {
+
+    connection.query("SELECT * FROM departments", function (err, res) {
+        if (err) throw err;
+        //loads departments table;
+        // console.log(res);
+        var table = new Table({
+            head: ['Department ID', 'Department Name', 'Overhead Cost', 'Total Sales', 'Total Profit'],
+            style: {
+                head: ['yellow'],
+                compact: false,
+                colAligns: ['center'],
+            }
+        });
+        console.log(" ");
+        console.log(chalk.yellow("=============================Product Sales by Department========================="));
+
+        connection.query('SELECT * FROM departments', function (err, res) {
+            if (err) throw err;
+
+            //this loops through the data pulled from the totalprofits database and pushes it into the table above
+            for (var i = 0; i < res.length; i++) {
+                table.push(
+                    [res[i].DEPARTMENT_ID, res[i].DEPARTMENT_NAME, res[i].OVER_HEAD_COSTS]);
+            }
+
+            console.log(" ");
+            console.log(table.toString());
+        })
+    });
+    setTimeout(() => {
+
+
+        inquirer
+            .prompt({
+                type: "list",
+                name: "continue",
+                message: "Return to Menu?",
+                choices: [
+                    "YES",
+                    "NO"
+                ]
+            })
+            .then(function (answer) {
+                if (answer.continue === "YES") {
+                    supervisorMenu();
+                } else if (answer.continue === "NO") {
+                    connection.end();
+                }
+            })
+    }, 1000);
+}
 
 function supervisorMenu() {
     //prompt supervisr
@@ -80,4 +133,36 @@ function productView() {
                 }
             })
     }, 1000);
+}
+
+function createDept() {
+    //prompt user to create department
+    inquirer
+        .prompt([{
+                type: "input",
+                name: "name",
+                message: "Please Enter New Department Name: "
+            },
+            {
+                type: "input",
+                name: "overHead",
+                message: "Please Enter the Overhead Cost of New Department: ",
+                validate: function (value) {
+                    return value > 0;
+                }
+            }
+        ])
+        .then(function (answer) {
+            //query new department table
+            connection.query("INSERT INTO departments (DEPARTMENT_NAME, OVER_HEAD_COSTS) VALUES (?,?)",
+                [answer.name, answer.overHead],
+                function (err, res) {
+                    if (err) throw err;
+                    if (res) {
+                        console.log(chalk.yellow("\n=================SUCCESSFULLY ADDED DEPARTMENT=====================\n"));
+                        deptTable();
+
+                    }
+                })
+        })
 }
