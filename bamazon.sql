@@ -5,16 +5,18 @@ USE bamazon_db;
 
 CREATE TABLE products
 (
-    Item_Id INT
+    ITEM_ID INT
     AUTO_INCREMENT NOT NULL,
-    Product_Name VARCHAR
+    PRODUCT_NAME VARCHAR
     (100) NOT NULL,
-    Department_Name VARCHAR
-    (100) NOT NULL,
-    Price DECIMAL
-    (10,2) NOT NULL,
-    Stock_Quantity INT
-    (10) NOT NULL,
+    DEPARTMENT_NAME VARCHAR
+    (100),
+    PRICE DECIMAL
+    (10,2),
+    PRODUCT_SALES DECIMAL
+    (10,2) DEFAULT 0,
+    STOCK_QUANTITY INT
+    (10),
     PRIMARY KEY
     (item_id)
 );
@@ -33,7 +35,32 @@ CREATE TABLE products
         ("Totino's Pizza Rolls 250 ct", "Food", 6.99, 25),
         ("Pack of 10 Paper Clips from Junk Drawer w/Chewed Pen Caps", "Office", 2.50, 30),
         ("Acer 24.5 Gaming Monitor 144hz HDR", "Electronics", 229.99, 9),
-        ("Partially Constructed Computer Desk from IKEA", "Office", 120.00, 3)
+        ("Partially Constructed Computer Desk from IKEA", "Office", 120.00, 3);
 
     SELECT *
     FROM products;
+
+    CREATE TABLE departments
+    (
+        DEPARTMENT_ID INT
+        AUTO_INCREMENT NOT NULL,
+        DEPARTMENT_NAME VARCHAR
+        (100) NOT NULL,
+        OVER_HEAD_COSTS DECIMAL
+        (10,2) NOT NULL, 
+        PRIMARY KEY
+        (DEPARTMENT_ID)
+);
+
+        INSERT INTO departments
+            (DEPARTMENT_NAME, OVER_HEAD_COSTS)
+        VALUES
+            ("Clothing" , 3500),
+            ("Electronics", 5000),
+            ("Office", 1000),
+            ("Food", 2500);
+
+        SELECT *
+        FROM departments;
+
+   

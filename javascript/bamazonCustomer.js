@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var chalk = require('chalk');
+var table = require("table");
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -201,13 +202,13 @@ function finalizePurchase() {
         })
         .then(function (answer) {
             if (answer.continue === "YES") {
+                finalTotal = (productAmount * productPrice);
                 // console.log(productAmount);
                 // console.log(finalProductId);
                 console.log(chalk.yellow("\n=====================Finalizing Your Purchase=========================\n"));
-                connection.query("UPDATE products SET STOCK_QUANTITY = stock_quantity - ? WHERE ITEM_ID = ?",
-                    [productAmount, finalProductId],
+                connection.query("UPDATE products SET STOCK_QUANTITY = stock_quantity - ?, PRODUCT_SALES = product_sales + ? WHERE ITEM_ID = ?",
+                    [productAmount, finalTotal, finalProductId],
                     function (err, res) {
-                        finalTotal = (productAmount * productPrice);
                         if (err) throw err;
                         if (res) {
                             // console.log(res);
