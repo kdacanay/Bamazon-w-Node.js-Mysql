@@ -183,7 +183,7 @@ function finalizeAdd(displayItem) {
         .prompt({
             type: "input",
             name: "quantity",
-            message: "Enter Amount to Add to Product: " + displayItem,
+            message: "Enter Amount to Add to Product: " + displayItem + " : ",
             validate: function (value) {
                 if (value) {
                     return true;
@@ -206,4 +206,61 @@ function finalizeAdd(displayItem) {
                     }
                 })
         }))
+}
+
+function addProduct() {
+    //prompt user for new product info
+    //----local variable for departments
+    inquirer
+        .prompt([{
+            type: "input",
+            name: "productAdd",
+            message: "Enter the Product Name You Wish to Add:",
+            validate: function (value) {
+                if (value) {
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            type: "input",
+            name: "departmentAdd",
+            message: "Enter the Department Name for New Product:",
+            validate: function (value) {
+                if (value) {
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            type: "input",
+            name: "price",
+            message: "Enter the Price for New Product:",
+            validate: function (value) {
+                return value > 0;
+            }
+        }, {
+            type: "input",
+            name: "quantity",
+            message: "Enter the Amount in Stock:",
+            validate: function (value) {
+                return value > 0;
+            }
+        }])
+        .then(function (answer) {
+            connection.query("INSERT INTO products SET ?", {
+                PRODUCT_NAME: answer.productAdd,
+                DEPARTMENT_NAME: answer.departmentAdd,
+                PRICE: answer.price,
+                STOCK_QUANTITY: answer.quantity
+            }, function (err, res) {
+                if (err) throw err;
+                if (res) {
+                    console.log(chalk.yellow("\nSuccessfully Added: Product: " + answer.productAdd + " | " + "Department: " + answer.departmentAdd + " | " + "Price: " + answer.price + " | " + "Stock Quantity: " + answer.quantity + " | "));
+                    setTimeout(() => {
+                        managerMenu();
+                    }, 1000);
+                }
+            })
+        })
 }
