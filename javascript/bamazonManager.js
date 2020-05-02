@@ -28,7 +28,7 @@ function managerMenu() {
         .prompt({
             type: "list",
             name: "select",
-            message: "Please make a selection: ",
+            message: "Please Make a Selection: ",
             choices: [
                 "VIEW PRODUCTS FOR SALE",
                 "VIEW LOW INVENTORY",
