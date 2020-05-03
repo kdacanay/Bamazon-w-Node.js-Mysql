@@ -21,10 +21,31 @@ Created a MySQL database called ```Bamazon``` and connects to ```bamazonCustomer
 <img src="images/bamazonCustomer.PNG.jpg" width=500>
 
 ## Bamazon Manager ##
+* input ```node bamazonManager.js```
+* Menu Options: ```View Products for Sale``` , ```View Low Inventory```, ```Add to Inventory```, ```Add New Product```
+* ```View Products for Sale```
+          * app lists all available items, including ids, names, prices, etc.
+* ```View Low Inventory```
+          * app lists all products lower than quantity of 5
+* ```Add to Inventory```
+          * user can add more to stock quantity to any product
+* ```Add New Product```
+          * user can create a new product w/name, department, price and stock quantity
 <img src="images/bamazonManager1.jpg" width=500>
-
 <img src="images/bamazonManager2.jpg" width=500>
-          
+
+## Bamazon Supervisor ## 
+* input ```node bamazonSupervisor.js```
+* Menu Options: ```View Daily Inventory```, ```View Product Sales by Department```, ```Create New Department```
+* utilized MySQL sum, aliases, group bys, and joins:
+          * this code combined both ```products``` and ```departments``` tables to display total profits:
+          * ```"SELECT departmentSales.DEPARTMENT_ID,departmentSales.DEPARTMENT_NAME,departmentSales.OVER_HEAD_COSTS, SUM(departmentSales.PRODUCT_SALES) as PRODUCT_SALES, (SUM(departmentSales.PRODUCT_SALES) - departmentSales.OVER_HEAD_COSTS) as TOTAL_PROFITS FROM(SELECT departments.DEPARTMENT_ID, departments.DEPARTMENT_NAME, departments.OVER_HEAD_COSTS, IFNULL(products.PRODUCT_SALES, 0) as PRODUCT_SALES FROM products RIGHT JOIN departments ON products.DEPARTMENT_NAME = departments.DEPARTMENT_NAME) as departmentSales GROUP BY DEPARTMENT_ID "```
+* ```View Daily Inventory```
+          * can view list of all available items
+* ```View Product Sales by Department```
+          * table displays w/dept Id, dept name, over head costs, product sales, total profits
+* ```Create New Department```
+          * can create new department w/id, name and over head costs
 <img src="images/bamazonSupervisor.jpg" width=500>
 
 
