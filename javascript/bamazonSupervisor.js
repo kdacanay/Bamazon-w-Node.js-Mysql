@@ -23,59 +23,6 @@ connection.connect(function (err) {
     supervisorMenu();
 });
 
-function deptTable() {
-
-    connection.query("SELECT * FROM departments", function (err, res) {
-        if (err) throw err;
-        //loads departments table;
-        // console.log(res);
-        var table = new Table({
-            head: ['Department ID', 'Department Name', 'Overhead Cost', 'Total Sales', 'Total Profit'],
-            style: {
-                head: ['yellow'],
-                compact: false,
-                colAligns: ['center'],
-            }
-        });
-        console.log(" ");
-        console.log(chalk.yellow("=============================Product Sales by Department========================="));
-
-        connection.query('SELECT * FROM departments', function (err, res) {
-            if (err) throw err;
-
-            //this loops through the data pulled from the totalprofits database and pushes it into the table above
-            for (var i = 0; i < res.length; i++) {
-                table.push(
-                    [res[i].DEPARTMENT_ID, res[i].DEPARTMENT_NAME, res[i].OVER_HEAD_COSTS]);
-            }
-
-            console.log(" ");
-            console.log(table.toString());
-        })
-    });
-    setTimeout(() => {
-
-
-        inquirer
-            .prompt({
-                type: "list",
-                name: "continue",
-                message: "Return to Menu?",
-                choices: [
-                    "YES",
-                    "NO"
-                ]
-            })
-            .then(function (answer) {
-                if (answer.continue === "YES") {
-                    supervisorMenu();
-                } else if (answer.continue === "NO") {
-                    connection.end();
-                }
-            })
-    }, 1000);
-}
-
 function supervisorMenu() {
     //prompt supervisr
     inquirer
@@ -135,6 +82,42 @@ function productView() {
     }, 1000);
 }
 
+function productSales() {
+
+    console.log(chalk.yellow("\n=============================Product Sales by Department=========================\n"));
+    connection.query(
+        "SELECT departmentSales.DEPARTMENT_ID, departmentSales.DEPARTMENT_NAME, departmentSales.OVER_HEAD_COSTS, SUM(departmentSales.PRODUCT_SALES) as PRODUCT_SALES, (SUM(departmentSales.PRODUCT_SALES) - departmentSales.OVER_HEAD_COSTS) as TOTAL_PROFITS FROM(SELECT departments.DEPARTMENT_ID, departments.DEPARTMENT_NAME, departments.OVER_HEAD_COSTS, IFNULL(products.PRODUCT_SALES, 0) as PRODUCT_SALES FROM products RIGHT JOIN departments ON products.DEPARTMENT_NAME = departments.DEPARTMENT_NAME) as departmentSales GROUP BY DEPARTMENT_ID ",
+        function (err, res) {
+            if (err) throw err;
+            //loads departments table;
+            if (res) {
+                console.table(res);
+            }
+
+            setTimeout(() => {
+
+
+                inquirer
+                    .prompt({
+                        type: "list",
+                        name: "continue",
+                        message: "Return to Menu?",
+                        choices: [
+                            "YES",
+                            "NO"
+                        ]
+                    })
+                    .then(function (answer) {
+                        if (answer.continue === "YES") {
+                            supervisorMenu();
+                        } else if (answer.continue === "NO") {
+                            connection.end();
+                        }
+                    })
+            }, 1000);
+        });
+}
+
 function createDept() {
     //prompt user to create department
     inquirer
@@ -160,7 +143,7 @@ function createDept() {
                     if (err) throw err;
                     if (res) {
                         console.log(chalk.yellow("\n=================SUCCESSFULLY ADDED DEPARTMENT=====================\n"));
-                        deptTable();
+                        supervisorMenu();
 
                     }
                 })
