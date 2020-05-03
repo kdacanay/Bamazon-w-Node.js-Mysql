@@ -38,8 +38,8 @@ Created a MySQL database called ```Bamazon``` and connects to ```bamazonCustomer
 * input ```node bamazonSupervisor.js```
 * Menu Options: ```View Daily Inventory```, ```View Product Sales by Department```, ```Create New Department```
 * utilized MySQL sum, aliases, group bys, and joins:
-          * this code combined both ```products``` and ```departments``` tables to display total profits:
-          * ```"SELECT departmentSales.DEPARTMENT_ID,departmentSales.DEPARTMENT_NAME,departmentSales.OVER_HEAD_COSTS, SUM(departmentSales.PRODUCT_SALES) as PRODUCT_SALES, (SUM(departmentSales.PRODUCT_SALES) - departmentSales.OVER_HEAD_COSTS) as TOTAL_PROFITS FROM(SELECT departments.DEPARTMENT_ID, departments.DEPARTMENT_NAME, departments.OVER_HEAD_COSTS, IFNULL(products.PRODUCT_SALES, 0) as PRODUCT_SALES FROM products RIGHT JOIN departments ON products.DEPARTMENT_NAME = departments.DEPARTMENT_NAME) as departmentSales GROUP BY DEPARTMENT_ID "```
+    * this code combined both ```products``` and ```departments``` tables to display total profits:
+    * ```"SELECTdepartmentSales.DEPARTMENT_ID,departmentSales.DEPARTMENT_NAME,departmentSales.OVER_HEAD_COSTS, SUM(departmentSales.PRODUCT_SALES) as PRODUCT_SALES, (SUM(departmentSales.PRODUCT_SALES) - departmentSales.OVER_HEAD_COSTS) as TOTAL_PROFITS FROM(SELECT departments.DEPARTMENT_ID, departments.DEPARTMENT_NAME, departments.OVER_HEAD_COSTS, IFNULL(products.PRODUCT_SALES, 0) as PRODUCT_SALES FROM products RIGHT JOIN departments ON products.DEPARTMENT_NAME = departments.DEPARTMENT_NAME) as departmentSales GROUP BY DEPARTMENT_ID "```
 * ```View Daily Inventory```
           * can view list of all available items
 * ```View Product Sales by Department```
