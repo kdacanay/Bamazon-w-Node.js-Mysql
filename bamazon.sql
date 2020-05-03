@@ -10,7 +10,7 @@ CREATE TABLE products
     PRODUCT_NAME VARCHAR
     (100) NOT NULL,
     DEPARTMENT_NAME VARCHAR
-    (100),
+    (100), 
     PRICE DECIMAL
     (10,2),
     PRODUCT_SALES DECIMAL
@@ -20,8 +20,6 @@ CREATE TABLE products
     PRIMARY KEY
     (item_id)
 );
-
-
 
     INSERT INTO products
         (PRODUCT_NAME, DEPARTMENT_NAME, PRICE, STOCK_QUANTITY)
